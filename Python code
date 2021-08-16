@@ -1,0 +1,653 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[171]:
+
+
+#importing required libraries
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+
+# In[172]:
+
+
+#Data Collection
+#reading dataset into a pandas dataframe
+df = pd.read_csv(r'C:\Users\Sara\Desktop\R Project\credit_train.csv')
+
+
+# In[173]:
+
+
+df.head()
+print(len(df))
+
+
+# In[174]:
+
+
+df.head()
+
+
+# In[175]:
+
+
+#Checking the number of missing values in each column
+df.isnull().sum()
+
+
+# In[176]:
+
+
+#Checking the datatype of each column in the dataframe
+df.dtypes
+
+
+# In[177]:
+
+
+#Custom encoding of Loan_Status
+df['Loan_Status'].replace('Fully Paid', 1 ,inplace=True)
+df['Loan_Status'].replace('Charged Off', 0 ,inplace=True)
+df.head()
+df.dtypes
+
+
+# In[178]:
+
+
+df.head()
+
+
+# In[179]:
+
+
+#Data Visualisation
+sns.set(style="whitegrid")
+ax = sns.scatterplot(x="Annual_Income", y="Loan_Status", data=df)
+
+
+# In[180]:
+
+
+ax = sns.scatterplot(x="Credit_Score", y="Loan_Status", data=df)
+
+
+# In[181]:
+
+
+ax = sns.scatterplot(x="Monthly_Debt", y="Loan_Status", data=df)
+
+
+# In[182]:
+
+
+ax = sns.scatterplot(x="Years_of_Credit_History", y="Loan_Status", data=df)
+
+
+# In[183]:
+
+
+ax = sns.scatterplot(x="Months_since_last_delinquent", y="Loan_Status", data=df)
+
+
+# In[184]:
+
+
+ax = sns.scatterplot(x="Number_of_Credit_Problems", y="Loan_Status", data=df)
+
+
+# In[185]:
+
+
+ax = sns.scatterplot(x="Current_Credit_Balance", y="Loan_Status", data=df)
+
+
+# In[186]:
+
+
+ax = sns.scatterplot(x="Bankruptcies", y="Loan_Status", data=df)
+
+
+# In[187]:
+
+
+ax = sns.scatterplot(x="Tax_Liens", y="Loan_Status", data=df)
+
+
+# In[188]:
+
+
+categorical = ['Term', 'Years_in_current_job', 'Home_Ownership', 'Purpose']
+fig, ax = plt.subplots(1, 4, figsize=(20, 5))
+for variable, subplot in zip(categorical, ax.flatten()):
+    sns.countplot(df[variable], ax=subplot)
+    for label in subplot.get_xticklabels():
+        label.set_rotation(90)
+
+
+# In[189]:
+
+
+sns.jointplot(x=df['Annual_Income'], y=df['Credit_Score']);
+
+
+# In[190]:
+
+
+fig = plt.figure(figsize=(18, 14))
+corr = df.corr()
+c = plt.pcolor(corr)
+plt.yticks(np.arange(0.5, len(corr.index), 1), corr.index)
+plt.xticks(np.arange(0.5, len(corr.columns), 1), corr.columns)
+fig.colorbar(c)
+
+
+# In[191]:
+
+
+fig, ax = plt.subplots(1, 4, figsize=(20, 5))
+for var, subplot in zip(categorical, ax.flatten()):
+    sns.boxplot(x=var, y='Loan_Status', data=df, ax=subplot)
+    for label in subplot.get_xticklabels():
+        label.set_rotation(90)
+
+
+# In[192]:
+
+
+df.drop(['Loan_ID'],axis=1, inplace=True)
+
+
+# In[193]:
+
+
+df.drop(['Customer_ID'], axis=1, inplace=True)
+
+
+# In[194]:
+
+
+# Get number of positve and negative examples
+pos = df[df["Loan_Status"] == 1].shape[0]
+neg = df[df["Loan_Status"] == 0].shape[0]
+print(pos)
+print(neg)
+
+
+# In[195]:
+
+
+#Counting the number of positive and negative instances of target variable  - Loan_Status
+plt.figure(figsize=(8, 6))
+sns.countplot(df["Loan_Status"])
+plt.xticks((0, 1), ["Fully Paid", "Charged Off"])
+plt.xlabel("")
+plt.ylabel("Count")
+plt.title("Class counts", y=1, fontdict={"fontsize": 20});
+
+
+# In[196]:
+
+
+df.dtypes
+
+
+# In[197]:
+
+
+df.Term.unique()
+
+
+# In[198]:
+
+
+#Custom Encoding of Term
+df['Term'].replace('Short Term', 1 ,inplace=True)
+df['Term'].replace('Long Term', 2 ,inplace=True)
+df.head()
+
+
+# In[199]:
+
+
+df.Home_Ownership.unique()
+
+
+# In[200]:
+
+
+#Custom Encoding of Home_Ownership
+df['Home_Ownership'].replace('Home Mortgage', 1 ,inplace=True)
+df['Home_Ownership'].replace('Own Home', 2 ,inplace=True)
+df['Home_Ownership'].replace('Rent', 3 ,inplace=True)
+df['Home_Ownership'].replace('HaveMortgage', 4 ,inplace=True)
+df.head()
+
+
+# In[201]:
+
+
+#Label encoding
+df.Years_in_current_job.unique()
+
+
+# In[202]:
+
+
+from sklearn.preprocessing import LabelEncoder
+lab_enc = LabelEncoder()
+df['Years_in_current_job'] = lab_enc.fit_transform(df['Years_in_current_job'].astype('str'))
+df.head()
+
+
+# In[203]:
+
+
+df.dtypes
+
+
+# In[204]:
+
+
+#Label encoding of Purpose
+df.Purpose.unique()
+
+
+# In[205]:
+
+
+lab_enc = LabelEncoder()
+df['Purpose'] = lab_enc.fit_transform(df['Purpose'].astype('str'))
+df.head()
+
+
+# In[206]:
+
+
+df.dtypes
+
+
+# In[207]:
+
+
+df.isnull().sum()
+
+
+# In[208]:
+
+
+#Replacing missing values of each column by the mean of the respective column
+df['Credit_Score'].fillna((df['Credit_Score'].mean()), inplace=True)
+df['Annual_Income'].fillna((df['Annual_Income'].mean()), inplace=True)
+df['Months_since_last_delinquent'].fillna((df['Months_since_last_delinquent'].mean()), inplace=True)
+df['Maximum_Open_Credit'].fillna((df['Maximum_Open_Credit'].mean()), inplace=True)
+df['Bankruptcies'].fillna((df['Bankruptcies'].mean()), inplace=True)
+df['Tax_Liens'].fillna((df['Tax_Liens'].mean()), inplace=True)
+df.isnull().sum()
+
+
+# In[209]:
+
+
+df.head()
+
+
+# In[210]:
+
+
+#Replacing the infeasible Cuurent Loan Amount of 999999999 by column mean
+df.replace(to_replace = 99999999, 
+                 value = 308587, inplace = True) 
+
+
+# In[211]:
+
+
+#Splitting into X and Y dataframe
+df_x = df.drop('Loan_Status', axis = 1)
+df_x.head()
+
+
+# In[212]:
+
+
+df.isnull().sum()
+
+
+# In[213]:
+
+
+df_x.head()
+
+
+# In[214]:
+
+
+df_y = df.iloc[:,0]
+df_y.head()
+
+
+# In[215]:
+
+
+df_x.head()
+
+
+# In[216]:
+
+
+df_y.head()
+
+
+# In[217]:
+
+
+#Normalization
+def normalize(df):
+    result = df.copy()
+    for feature_name in df.columns:
+        max_value = df[feature_name].max()
+        min_value = df[feature_name].min()
+        result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+    return result
+
+
+# In[218]:
+
+
+df_x_norm = normalize(df_x)
+df_x_norm
+
+
+# In[219]:
+
+
+print(len(df_x))
+print(len(df_y))
+
+
+# In[220]:
+
+
+#Train Test Split
+from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict
+X_train, X_test, y_train, y_test = train_test_split(
+  df_x_norm, df_y, test_size=0.2, shuffle=True, random_state=123)
+
+
+# In[221]:
+
+
+X_train
+
+
+# In[222]:
+
+
+X_test
+
+
+# In[223]:
+
+
+y_train
+
+
+# In[224]:
+
+
+y_test
+
+
+# In[225]:
+
+
+#KNN Implementation
+def cross_val(X_train, y_train, model):
+   
+    from sklearn.model_selection import cross_val_score
+    accuracies = cross_val_score(estimator = model, X = X_train, y = y_train, cv = 5)
+    return accuracies.mean()
+
+
+def fit_and_evaluate(model):
+   
+   
+    model.fit(X_train, y_train)
+   
+   
+    model_pred = model.predict(X_test)
+    model_cross = cross_val(X_train, y_train, model)
+   
+   
+    return model_cross
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
+knn_cross = fit_and_evaluate(knn)
+print('KNN Performance on the test set: Cross Validation Score = %0.4f' % (knn_cross * 100.0))
+
+
+# In[226]:
+
+
+#Random Forest Implementation
+from sklearn.ensemble import RandomForestClassifier
+random = RandomForestClassifier(n_estimators = 10, criterion = 'entropy')
+random.fit(X_train, y_train)
+
+
+# In[227]:
+
+
+y_pred_ran = random.predict(X_test)
+predictions_ran = [round(value) for value in y_pred_ran]
+
+
+# In[228]:
+
+
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, predictions_ran)
+print("Accuracy : %.2f%%" % (accuracy * 100.0))
+
+
+# In[229]:
+
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test,predictions_ran))
+
+
+# In[230]:
+
+
+from sklearn.metrics import confusion_matrix
+print(confusion_matrix(y_test, predictions_ran))
+
+
+# In[231]:
+
+
+#Logistic Regression Implementation
+from sklearn.linear_model import LogisticRegression
+#create an instance and fit the model 
+logmodel = LogisticRegression()
+logmodel.fit(X_train, y_train)
+
+
+# In[232]:
+
+
+Predictions_log = logmodel.predict(X_test)
+
+
+# In[233]:
+
+
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, Predictions_log)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+
+# In[234]:
+
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test,Predictions_log))
+
+
+# In[235]:
+
+
+from sklearn.metrics import confusion_matrix
+print(confusion_matrix(y_test, Predictions_log))
+
+
+# In[236]:
+
+
+#XGBoost Implementation
+from xgboost import XGBClassifier
+model = XGBClassifier(gamma = 1, learning_rate = 0.1, max_depth = 6)
+model.fit(X_train, y_train)
+
+
+# In[237]:
+
+
+y_pred = model.predict(X_test)
+predictions = [round(value) for value in y_pred]
+
+
+# In[238]:
+
+
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, predictions)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+
+# In[239]:
+
+
+#Appending the predicted value to the test set
+X_test['Loan_Status'] = predictions
+
+
+# In[240]:
+
+
+X_test
+
+
+# In[241]:
+
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test,predictions))
+
+
+# In[242]:
+
+
+from sklearn.metrics import confusion_matrix
+print(confusion_matrix(y_test, predictions))
+
+
+# In[243]:
+
+
+#Analysing conclusive relationship between Annual Income and Loan Status
+a = len(df[(df['Annual_Income'] > 308587) & (df['Loan_Status'] == 0)])
+b = len(df[(df['Loan_Status'] == 0)])
+a
+
+
+# In[244]:
+
+
+b
+
+
+# In[245]:
+
+
+a/b*100
+
+
+# In[246]:
+
+
+#Analysing conclusive relationship between Term and Loan Status
+c = len(df[(df['Term'] == 2) & (df['Loan_Status'] == 0)])
+
+
+# In[247]:
+
+
+c/b*100
+
+
+# In[248]:
+
+
+#Analysing conclusive relationship between Purpose and Loan Status
+d = len(df[(df['Purpose'] == 3) & (df['Loan_Status'] == 0)])
+
+
+# In[249]:
+
+
+d/b*100
+
+
+# In[250]:
+
+
+df['Monthly_Debt'].mean()
+
+
+# In[251]:
+
+
+#Analysing conclusive relationship between Monthly Debt and Loan Status
+e = len(df[(df['Monthly_Debt'] > 18472.41) & (df['Loan_Status'] == 1)])
+
+
+# In[252]:
+
+
+f = len(df[(df['Loan_Status'] == 1)])
+
+
+# In[253]:
+
+
+e/f*100
+
+
+# In[254]:
+
+
+#Deriving the feature importance ranking
+from sklearn.ensemble import ExtraTreesClassifier
+model = ExtraTreesClassifier()
+model.fit(X_train, y_train)
+
+
+# In[255]:
+
+
+print(model.feature_importances_)
+
+
+# In[ ]:
+
+
+
+
